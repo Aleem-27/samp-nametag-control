@@ -15,7 +15,8 @@ local originalSettings = {
 
 local hideTags = false
 local getBonePosition = ffi.cast("int (__thiscall*)(void*, float*, int, bool)", 0x5E4280)
-local renderFont = renderCreateFont("Arial", 10, 0x1 + 0x4)
+local renderFont = renderCreateFont("Arial", 9, 0x1 + 0x4)
+local renderFontSmall = renderCreateFont("Arial", 8, 0x1 + 0x4)
 
 -- Functions
 function getBodyPartCoordinates(id, handle)
@@ -67,6 +68,14 @@ function drawCustomTags()
                 local name = sampGetPlayerNickname(i)
                 local text = string.format("%s (%d)", name, i)
 
+                -- AFK check
+                local afk = sampIsPlayerPaused(i)
+                if afk then
+                    local px, py, pz = getCharCoordinates(ped)
+                    local afkSX, afkSY = convert3DCoordsToScreen(px, py, pz + 0.5)
+                    renderFontDrawText(renderFontSmall, "AFK", afkSX - 10, afkSY + 3, 0xFFD2D2D2)
+                end
+
                 -- Ensure players without target color are skipped
                 local color = sampGetPlayerColor(i)
                 if color == myColor then
@@ -74,7 +83,7 @@ function drawCustomTags()
                 end
 
                 -- Name tag
-                renderFontDrawText(renderFont, text, sx - renderGetFontDrawTextLength(renderFont, text) / 2, sy, color)
+                renderFontDrawText(renderFont, text, sx - renderGetFontDrawTextLength(renderFont, text) / 2, sy + 4, color)
 
                 local armor = sampGetPlayerArmor(i)
                 local armorY = sy + renderGetFontDrawHeight(renderFont) + 4
@@ -84,7 +93,7 @@ function drawCustomTags()
                 if armor > 1 then
                     renderDrawBoxWithBorder(sx - 24, armorY, 50, 6, 0xFF000000, 1, 0xFF000000)
                     armor = math.max(0, math.min(armor, 100))
-                    renderDrawBoxWithBorder(sx - 24, armorY, armor / 2, 6, 0xFFFFFFFF, 1, 0x00000000)
+                    renderDrawBoxWithBorder(sx - 24, armorY, armor / 2, 6, 0xFFC8C8C8, 1, 0x00000000)
                     hpY = armorY + 8
                 end
 
@@ -93,7 +102,7 @@ function drawCustomTags()
 
                 renderDrawBoxWithBorder(sx - 24, hpY, 50, 6, 0xFF000000, 1, 0xFF000000)
                 hp = math.max(0, math.min(hp, 100))
-                renderDrawBoxWithBorder(sx - 24, hpY, hp / 2, 6, 0xFFFF0000, 1, 0x00000000)
+                renderDrawBoxWithBorder(sx - 24, hpY, hp / 2, 6, 0xFFB92228, 1, 0x00000000)
 
             end
         end
