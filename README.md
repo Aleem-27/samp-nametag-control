@@ -2,21 +2,40 @@
 
 A simple Lua script for UIF Zone & Gang wars that hides teammate nametags and health bars, helping you focus on enemy players without unnecessary visual clutter.
 
-When enabled, the script disables the server's default nametags and replaces them with custom nametags that are only rendered for enemy players. Enemy health, armor, and AFK indicators remain visible while teammates are completely hidden.
+When enabled, the script disables the server's default nametags and replaces them with custom enemy-only nametags. The displayed information can be customized to show the player's name, ID, or both. Enemy health, armor, and AFK indicators remain visible while teammates are completely hidden.
 
 ## Usage
 
-Use the following command in-game, preferably during a zone or gang war:
+Use the following commands in-game, preferably during a zone or gang war:
+
+### Toggle Custom Nametags
 
 ```text
 /toggletags
 ```
 
-* **Enabled** — teammate nametags are hidden.
+* **Enabled** — teammate nametags are hidden and custom enemy-only nametags are rendered.
 * **Disabled** — original server nametag settings are restored.
 
+### Change Tag Display Mode
+
+```text
+/tagmode full
+/tagmode name
+/tagmode id
+```
+
+Available modes:
+
+* **full** — displays the player's name and ID (`PlayerName (123)`).
+* **name** — displays only the player's name (`PlayerName`).
+* **id** — displays only the player's ID (`(123)`).
+
 > [!NOTE]
+> Tag mode only affects custom enemy nametags rendered by this script.
+>
 > The script saves the original nametag settings and restores them automatically when disabled.
+
 
 > [!WARNING]
 > This script is intended specifically for UIF Zone & Gang Wars.

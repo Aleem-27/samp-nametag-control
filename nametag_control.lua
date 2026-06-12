@@ -45,12 +45,12 @@ function drawCustomTags()
             local x, y, z = getBodyPartCoordinates(8, ped)
             local dist = getDistanceBetweenCoords3d(px, py, pz, x, y, z)
 
-            -- distance check
+            -- Distance check
             if originalSettings.distance ~= nil and dist > originalSettings.distance then
                 goto continue
             end
 
-            -- visibility / wall check
+            -- Visibility / wall check
             local camX, camY, camZ = getActiveCameraCoordinates()
             local blocked =
                 processLineOfSight(
