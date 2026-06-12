@@ -13,9 +13,16 @@ local originalSettings = {
     render = nil,
 }
 
-local hideTags = false
+local tagMode = {
+    full = 1,
+    name = 2,
+    id = 3
+}
+local currentTagMode = tagMode.full
+
+local hideAllTags = false
 local getBonePosition = ffi.cast("int (__thiscall*)(void*, float*, int, bool)", 0x5E4280)
-local renderFont = renderCreateFont("Arial", 9, 0x1 + 0x4)
+local renderFont = renderCreateFont("Arial", 10, 0x1 + 0x4)
 local renderFontSmall = renderCreateFont("Arial", 8, 0x1 + 0x4)
 
 -- Functions
@@ -66,7 +73,15 @@ function drawCustomTags()
                 local sx, sy = convert3DCoordsToScreen(x, y, z + 0.4 + (dist * 0.05))
 
                 local name = sampGetPlayerNickname(i)
-                local text = string.format("%s (%d)", name, i)
+                local text = ""
+
+                if currentTagMode == tagMode.full then
+                    text = string.format("%s (%d)", name, i)
+                elseif currentTagMode == tagMode.name then
+                    text = string.format("%s", name)
+                elseif currentTagMode == tagMode.id then
+                    text = string.format("(%i)", i)
+                end
 
                 -- AFK check
                 local afk = sampIsPlayerPaused(i)
@@ -91,7 +106,7 @@ function drawCustomTags()
 
                 -- Armor bar
                 if armor > 1 then
-                    renderDrawBoxWithBorder(sx - 24, armorY, 50, 6, 0xFF000000, 1, 0xFF000000)
+                    renderDrawBoxWithBorder(sx - 24, armorY, 50, 6, 0xFF282828, 1, 0xFF000000)
                     armor = math.max(0, math.min(armor, 100))
                     renderDrawBoxWithBorder(sx - 24, armorY, armor / 2, 6, 0xFFC8C8C8, 1, 0x00000000)
                     hpY = armorY + 8
@@ -100,7 +115,7 @@ function drawCustomTags()
                 -- Health bar
                 local hp = sampGetPlayerHealth(i)
 
-                renderDrawBoxWithBorder(sx - 24, hpY, 50, 6, 0xFF000000, 1, 0xFF000000)
+                renderDrawBoxWithBorder(sx - 24, hpY, 50, 6, 0xFF4b0b14, 1, 0xFF000000)
                 hp = math.max(0, math.min(hp, 100))
                 renderDrawBoxWithBorder(sx - 24, hpY, hp / 2, 6, 0xFFB92228, 1, 0x00000000)
 
@@ -127,11 +142,11 @@ function main()
 	sampAddChatMessage(string.format("[UIF] {D2D2D2}%s v%s by %s loaded.", __name__, __version__, __author__), 0xFFFF9900)
 
     sampRegisterChatCommand("toggletags", function()
-        hideTags = not hideTags
+        hideAllTags = not hideAllTags
         local pStSet = sampGetServerSettingsPtr()
 
         if pStSet ~= 0 then
-            if hideTags then
+            if hideAllTags then
                 originalSettings.distance = mem.getfloat(pStSet + 39, true)
                 originalSettings.render = mem.getfloat(pStSet + 56, true)
                 mem.setfloat(pStSet + 39, 0.0, true)
@@ -147,9 +162,26 @@ function main()
         end
     end)
 
+    sampRegisterChatCommand("tagmode", function(arg)
+        arg = arg:lower()
+
+        if arg == "full" then
+            currentTagMode = tagMode.full
+            sampAddChatMessage("[Nametag Control] {D2D2D2}Mode: Name + ID", 0xFFFF9900)
+        elseif arg == "name" then
+            currentTagMode = tagMode.name
+            sampAddChatMessage("[Nametag Control] {D2D2D2}Mode: Name only", 0xFFFF9900)
+        elseif arg == "id" then
+            currentTagMode = tagMode.id
+            sampAddChatMessage("[Nametag Control] {D2D2D2}Mode: ID only", 0xFFFF9900)
+        else
+            sampAddChatMessage("[Nametag Control] {D2D2D2}Usage: /tagmode full | name | id", 0xFFFF9900)
+        end
+    end)
+
     while true do
         wait(0)
-        if hideTags then
+        if hideAllTags then
             drawCustomTags()
         end
     end
